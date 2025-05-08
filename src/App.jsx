@@ -10,13 +10,42 @@ function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    
+    fetchUsers();
   }, []);
 
+  const fetchUsers = async () => {
+    const res = await fetch('Ejemplo');
+    const data = await res.json();
+    setUsers(data);
+  }
 
-  const handleSubmit = (e) => {
+  //Botón de enviar / actualizar
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Prueba");
+    const data = { name, firstName, secondName };
+    try {
+      if (editId) {
+        await fetch (`Ejemplo/${editId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        setEditId(null);
+      } else {
+        await fetch (`Ejemplo`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        console.log('Us creado');
+      }
+      setName('');
+      setFirstName('');
+      setSecondName('');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error', error);
+    }
   }
 
   const handleEdit = (user) => {
@@ -26,8 +55,15 @@ function App() {
     setEditId(user._id);
   }
 
-  const handleEliminate = () => {
-    
+  const handleEliminate = async (id) => {
+    try {
+      await fetch (`Ejemplo/${id}`, {
+        method: 'DELETE'
+      });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error: ', error);
+    }
   }
 
   return (
